@@ -33,10 +33,17 @@ namespace WeatherApp
                 string url = string.Format("https://api.openweathermap.org/data/2.5/weather?q={0}&appid={1}", city, apiKey);
                 var json = web.DownloadString(url);
                 WeatherInfo.root Info = JsonConvert.DeserializeObject<WeatherInfo.root>(json);
-                Console.WriteLine($"{city} {DateTime.UtcNow}\n\nCurrent Conditions: {Info.weather[0].main}\n" +
+
+                foreach (var weather in Info.weather)
+                {
+                    Console.WriteLine($"\nCurrent Conditions: {weather.main}    Description: {weather.description}");
+                }
+
+                Console.WriteLine(
                     $"Curent Temperature: {ConvertToCelcius(Info.main.temp)}ºC     Maximum Temperature: {ConvertToCelcius(Info.main.temp_max)}ºC    Minimum Temperature: {ConvertToCelcius(Info.main.temp_min)}ºC " +
-                    $"\nWind: {Info.wind.speed} m/s" +
-                    $"\nSunrise: {ConvertDateTime(Info.sys.sunrise)} AM\nSunset: {ConvertDateTime(Info.sys.sunset)} PM" );
+                    $"\nWind: {Info.wind.speed} m/s    Direction: {Info.wind.deg}º" +
+                    $"\nSunrise: {ConvertDateTime(Info.sys.sunrise)} AM\nSunset:  {ConvertDateTime(Info.sys.sunset)} PM" +
+                    $"\nPressure: {Info.main.pressure}hPa    Humidity: {Info.main.humidity}%");
 
 
 

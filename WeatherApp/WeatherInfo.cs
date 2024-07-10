@@ -21,7 +21,7 @@ namespace WeatherApp
         public class weather
         {
             public string main { get; set; }
-            public string discription { get; set; }
+            public string description { get; set; }
             public string icon { get; set; }
         }
 
