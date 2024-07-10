@@ -58,6 +58,7 @@ namespace WeatherApp
             public coord coord { get; set; }
             public List<weather> weather { get; set; }
             public main main { get; set; }
+            public rain rain { get; set; }
             public wind wind { get; set; }
             public sys sys { get; set; }
 
