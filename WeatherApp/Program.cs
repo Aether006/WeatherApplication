@@ -2,32 +2,59 @@
 using System.Dynamic;
 using System.Net;
 using System.Runtime.InteropServices;
-
+using System.Linq;
 namespace WeatherApp
 {
     internal class Program
     {
-        string apiKey = "91274abeabcd1ff8b14dc582b7d94e96";
-        public string city;
+        
+        
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter a city to view weather");
+            Console.SetWindowSize(155,40);
             
+            string title = " ___       __   ________  ________  ___       ________          ___       __   _______   ________  _________  ___  ___  _______   ________  ___       \r\n|\\  \\     |\\  \\|\\   __  \\|\\   __  \\|\\  \\     |\\   ___ \\        |\\  \\     |\\  \\|\\  ___ \\ |\\   __  \\|\\___   ___\\\\  \\|\\  \\|\\  ___ \\ |\\   __  \\|\\  \\      \r\n\\ \\  \\    \\ \\  \\ \\  \\|\\  \\ \\  \\|\\  \\ \\  \\    \\ \\  \\_|\\ \\       \\ \\  \\    \\ \\  \\ \\   __/|\\ \\  \\|\\  \\|___ \\  \\_\\ \\  \\\\\\  \\ \\   __/|\\ \\  \\|\\  \\ \\  \\     \r\n \\ \\  \\  __\\ \\  \\ \\  \\\\\\  \\ \\   _  _\\ \\  \\    \\ \\  \\ \\\\ \\       \\ \\  \\  __\\ \\  \\ \\  \\_|/_\\ \\   __  \\   \\ \\  \\ \\ \\   __  \\ \\  \\_|/_\\ \\   _  _\\ \\  \\    \r\n  \\ \\  \\|\\__\\_\\  \\ \\  \\\\\\  \\ \\  \\\\  \\\\ \\  \\____\\ \\  \\_\\\\ \\       \\ \\  \\|\\__\\_\\  \\ \\  \\_|\\ \\ \\  \\ \\  \\   \\ \\  \\ \\ \\  \\ \\  \\ \\  \\_|\\ \\ \\  \\\\  \\\\ \\__\\   \r\n   \\ \\____________\\ \\_______\\ \\__\\\\ _\\\\ \\_______\\ \\_______\\       \\ \\____________\\ \\_______\\ \\__\\ \\__\\   \\ \\__\\ \\ \\__\\ \\__\\ \\_______\\ \\__\\\\ _\\\\|__|   \r\n    \\|____________|\\|_______|\\|__|\\|__|\\|_______|\\|_______|        \\|____________|\\|_______|\\|__|\\|__|    \\|__|  \\|__|\\|__|\\|_______|\\|__|\\|__|   ___ \r\n                                                                                                                                                 |\\__\\\r\n                                                                                                                                                 \\|__|";
+            string apiKey = "OPENWEATHERAPIKEY";
+            string city;
+
+            Console.WriteLine($"{title}\n\nEnter a city to view weather");
+            city = Console.ReadLine().ToLower();
+            
+            Console.WriteLine($"\nFetching weather data for {city}...\n");
+
+            GetWeather(city, apiKey);
         }
 
-        void GetWeather()
+         static void GetWeather(string city, string apiKey)
         {
-            using (WebClient client = new WebClient())
+            using (WebClient web = new WebClient())
             {
-                string url = string.Format("https://api.openweathermap.org/data/2.5/weather?q=london&appid=91274abeabcd1ff8b14dc582b7d94e96", city , apiKey);
-                var json = client.DownloadString(url);
+                string url = string.Format("https://api.openweathermap.org/data/2.5/weather?q={0}&appid={1}", city, apiKey);
+                var json = web.DownloadString(url);
                 WeatherInfo.root Info = JsonConvert.DeserializeObject<WeatherInfo.root>(json);
-                
-                
-                
+                Console.WriteLine($"{city} {DateTime.UtcNow}\n\nCurrent Conditions: {Info.weather[0].main}\n" +
+                    $"Curent Temperature: {ConvertToCelcius(Info.main.temp)}ºC     Maximum Temperature: {ConvertToCelcius(Info.main.temp_max)}ºC    Minimum Temperature: {ConvertToCelcius(Info.main.temp_min)}ºC " +
+                    $"\nWind: {Info.wind.speed} m/s" +
+                    $"\nSunrise: {ConvertDateTime(Info.sys.sunrise)} AM\nSunset: {ConvertDateTime(Info.sys.sunset)} PM" );
+
+
+
             }
 
+         static double ConvertToCelcius(double temp)
+            {
+                double temperature = temp - 273.15;
+                
+                return Math.Round(temperature,1);
+            }
+
+            DateTime ConvertDateTime(string millisec)
+            {
+                DateTime day = new DateTime(1970,1,1,0,0,0,DateTimeKind.Utc);
+                day = day.AddSeconds(Convert.ToDouble(millisec)).ToLocalTime();
+                return day;
+            }
         }
     }
 }
